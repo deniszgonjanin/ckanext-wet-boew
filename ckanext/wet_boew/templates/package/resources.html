@@ -1,0 +1,28 @@
+{% ckan_extends %}
+
+{% block primary_content_inner %}
+  {% if pkg.resources %}
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">{{ _('Resource Name') }}</th>
+        <th scope="col">{{ _('Format') }}</th>
+        <th scope="col">{{ _('Link') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for resource in pkg.resources %}
+      {% if resource.format != 'app' %}
+        {% snippet 'package/snippets/resource_item.html',
+          pkg=pkg, res=resource, res_num=loop.index, client_lang=client_lang %}
+      {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    {% trans url=h.url_for(controller='package', action='new_resource', id=pkg.name) %}
+      <p class="empty">This dataset has no data, <a href="{{ url }}">why not add some?</a></p>
+    {% endtrans %}
+  {% endif %}
+{% endblock %}
