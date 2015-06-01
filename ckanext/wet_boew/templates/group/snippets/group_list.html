@@ -1,8 +1,25 @@
 {% ckan_extends %}
 
 {% block group_list %}
-  <div class="align-center equalize">
-    {{ self.group_list_inner() }}
-  </div>
-  <div class="clear"></div>
+
+<section class="panel panel-default">
+
+    <div class="panel-heading">
+        {% if h.check_access('group_create') %}
+          {% link_for _('Add Group'), controller='group', action='new', class_="btn btn-primary", icon="plus-sign-alt" %}
+        {% endif %}
+    </div>
+
+    <div class="panel-body">
+
+        <div class="align-center equalize">
+            {% block group_list_inner %}
+            {% for group in groups %}
+                {% snippet "group/snippets/group_item.html", group=group, position=loop.index, loop_items=3 %}
+            {% endfor %}
+            {% endblock %}
+        </div>
+        <div class="clear"></div>
+    </div>
+</section>
 {% endblock %}
