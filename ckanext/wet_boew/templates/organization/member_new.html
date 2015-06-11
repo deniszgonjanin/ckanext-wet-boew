@@ -31,7 +31,17 @@
           {% else %}
              <input id="username" type="text" name="username" placeholder="{{ _('Username') }}"
             value="" class="control-medium" data-module="autocomplete"
-            data-module-source="/api/2/util/user/autocomplete?q=?">
+            data-module-source="/api/2/util/user/autocomplete?q=?" list="userlist" >
+
+            <datalist id="userlist">
+            	<!--[if lte IE 9]><select><![endif]-->
+                {% for user in h.userlist() %}
+                <option label="{{user.name}}" value="{{user.name}}"></option>
+                {% endfor %}
+            	<option label="Barrie" value="Barrie"></option>
+            	<!--[if lte IE 9]></select><![endif]-->
+            </datalist>
+
           {% endif %}
         </div>
       </div>

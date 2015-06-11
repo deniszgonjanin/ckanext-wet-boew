@@ -38,7 +38,7 @@ class WetTheme(p.SingletonPlugin):
         # files should be installed in the public folder
         p.toolkit.add_template_directory(config, 'templates')
         p.toolkit.add_public_directory(config, 'public')
-        
+
         # monkey patch helpers.py pagination method
         h.Page.pager = _wet_pager
         h.gravatar = _wet_no_gravatar
@@ -47,18 +47,19 @@ class WetTheme(p.SingletonPlugin):
         h._link_to = _link_to
 
     def get_helpers(self):
-      return {'link_to_user': self.link_to_user, 
+      return {'link_to_user': self.link_to_user,
               'get_datapreview': self.get_datapreview,
               'iso_to_goctime': self.iso_to_goctime,
               'geojson_to_wkt': self.geojson_to_wkt,
               'wet_url': self.wet_url,
               'get_map_type': self.get_map_type,
-              'canada_url': self.canada_url}
+              'canada_url': self.canada_url,
+              'userlist': self.user_list}
 
 
     def link_to_user(self, user, maxlength=0):
         """ Return the HTML snippet that returns a link to a user.  """
-        
+
         # Do not link to pseudo accounts
         if user in [model.PSEUDO_USER__LOGGED_IN, model.PSEUDO_USER__VISITOR]:
             return user
@@ -67,26 +68,26 @@ class WetTheme(p.SingletonPlugin):
             user = model.User.get(user_name)
             if not user:
                 return user_name
-            
+
         if user:
             _name = user.name if model.User.VALID_NAME.match(user.name) else user.id
             displayname = user.display_name
             if maxlength and len(user.display_name) > maxlength:
                 displayname = displayname[:maxlength] + '...'
             return html.tags.link_to(displayname,
-                           h.url_for(controller='user', action='read', id=_name)) 
-             
+                           h.url_for(controller='user', action='read', id=_name))
+
 
     def get_datapreview(self, res_id):
-     
+
         #import pdb; pdb.set_trace()
         dsq_results = ckan.logic.get_action('datastore_search')({}, {'resource_id': res_id, 'limit' : 100})
-        return h.snippet('package/wet_datatable.html', ds_fields=dsq_results['fields'], ds_records=dsq_results['records'])     
-      
+        return h.snippet('package/wet_datatable.html', ds_fields=dsq_results['fields'], ds_records=dsq_results['records'])
+
     def iso_to_goctime(self, isodatestr):
         dateobj = dateutil.parser.parse(isodatestr)
         return dateobj.strftime('%Y-%m-%d')
-      
+
     def geojson_to_wkt(self, gjson_str):
         ## Ths GeoJSON string should look something like:
         ##  u'{"type": "Polygon", "coordinates": [[[-54, 46], [-54, 47], [-52, 47], [-52, 46], [-54, 46]]]}']
@@ -117,6 +118,9 @@ class WetTheme(p.SingletonPlugin):
 
     def canada_url(self):
         return str(config.get(CANADACA_URL_OPTION, CANADACA_URL_DEFAULT))
+
+    def user_list(self):
+        return ckan.logic.get_action('user_list')({},{})
 
 
 def _build_nav_icon(menu_item, title, **kwargs):
@@ -169,18 +173,18 @@ def _link_to(text, *args, **kwargs):
 def _wet_pager(self, *args, **kwargs):
     ## a custom pagination method, because CKAN doesn't expose the pagination to the templates,
     ## and instead hardcodes the pagination html in helpers.py
-    
+
     kwargs.update(
         format=u"<ul class='pagination'>$link_previous ~2~ $link_next</ul>",
         symbol_previous=gettext('Previous').decode('utf-8'), symbol_next=gettext('Next').decode('utf-8'),
         curpage_attr={'class': 'disabled'}, link_attr={'class': 'active'}
     )
-    
+
     return super(h.Page, self).pager(*args, **kwargs)
-    
+
 def _wet_no_gravatar(email_hash, size=100, default=None):
     return ""
-    
+
 def _SI_number_span_close(number):
     ''' outputs a span with the number in SI unit eg 14700 -> 14.7k '''
     number = int(number)
