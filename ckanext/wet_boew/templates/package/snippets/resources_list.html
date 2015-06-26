@@ -1,13 +1,13 @@
 {% block resource_list %}
 {% if resources %}
 
-    <h4>{% block resource_list_title %}{{ _('Dataset Resources') }}{% endblock %}</h4>
+    <h4>{% block resource_list_title %}{{ _('Resources') }}{% endblock %}</h4>
     {% if pkg.resources %}
     {% block resource_list_inner %}
       <table class="table table-striped">
         <thead>
           <tr>
-            <th scope="col">{{ _('Resource Name') }}</th>
+            <th scope="col">{{ _('Resource') }}</th>
             <th scope="col">{{ _('Format') }}</th>
             <th scope="col">{{ _('Link') }}</th>
           </tr>
